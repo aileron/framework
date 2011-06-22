@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>a3framework</artifactId>
+        <groupId>cc.aileron</groupId>
+        <!--#{version}--><version>0.1</version><!--#-->
+    </parent>
+    <groupId>cc.aileron</groupId>
+    <artifactId>a3framework-wsgi-mobile</artifactId>
+    <!--#{version}-->
+    <name>a3framework-wsgi-mobile</name>
+    <version>0.1</version><!--#-->
+    <dependencies>
+        <dependency>
+            <groupId>cc.aileron</groupId>
+            <artifactId>a3framework-wsgi-template</artifactId>
+            <!--#{version}--><version>0.1</version><!--#-->
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.cssparser</groupId>
+            <artifactId>cssparser</artifactId>
+            <version>0.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.nekohtml</groupId>
+            <artifactId>nekohtml</artifactId>
+            <version>1.9.14</version>
+        </dependency>
+    </dependencies>
+</project>

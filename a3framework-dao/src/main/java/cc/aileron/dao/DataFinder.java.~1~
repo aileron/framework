@@ -1,0 +1,39 @@
+/**
+ * 
+ */
+package cc.aileron.dao;
+
+import java.util.List;
+
+/**
+ * @author aileron
+ * @param <T>
+ */
+public interface DataFinder<T> extends Iterable<T>
+{
+    /**
+     * @param object
+     */
+    void bind(T object);
+
+    /**
+     * @return count
+     */
+    int count();
+
+    /**
+     * @return list
+     */
+    List<T> list();
+
+    /**
+     * @param range
+     * @return list
+     */
+    List<T> list(DataFinderRange range);
+
+    /**
+     * @return T
+     */
+    T one();
+}

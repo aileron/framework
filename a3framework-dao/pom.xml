@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>a3framework</artifactId>
+        <groupId>cc.aileron</groupId>
+        <!--#{version}--><version>0.1</version><!--#-->
+    </parent>
+    <groupId>cc.aileron</groupId>
+    <artifactId>a3framework-dao</artifactId>
+    <!--#{version}-->
+    <name>a3framework-dao</name>
+    <version>0.1</version><!--#-->
+    <dependencies>
+        <dependency>
+            <groupId>cc.aileron</groupId>
+            <artifactId>a3framework-generic</artifactId>
+            <!--#{version}--><version>0.1</version><!--#-->
+        </dependency>
+        <dependency>
+            <groupId>cc.aileron</groupId>
+            <artifactId>a3framework-template</artifactId>
+            <!--#{version}--><version>0.1</version><!--#-->
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>0.9.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0-rc2</version>
+        </dependency>
+    </dependencies>
+</project>

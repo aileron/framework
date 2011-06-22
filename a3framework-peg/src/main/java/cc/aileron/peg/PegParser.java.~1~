@@ -1,0 +1,13 @@
+package cc.aileron.peg;
+
+/**
+ * @author aileron
+ */
+public interface PegParser
+{
+    /**
+     * @param context
+     * @return String[]
+     */
+    Object[] parse(PegContext context);
+}

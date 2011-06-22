@@ -1,0 +1,236 @@
+/**
+ * 
+ */
+package cc.aileron.wsgi;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+
+import cc.aileron.generic.util.ReflectionToString;
+import cc.aileron.wsgi.Wsgi.Method;
+import cc.aileron.wsgi.Wsgi.Request;
+
+/**
+ * @author aileron
+ */
+public class WsgiRequest implements Wsgi.Request
+{
+    static final ByteBuffer lineBuffer = ByteBuffer.allocate(1);
+    static final ByteBuffer stringBuffer = ByteBuffer.allocate(1024);
+
+    static int read(final ReadableByteChannel channel) throws IOException
+    {
+        int count = 0;
+        while ((channel.read(lineBuffer)) != -1)
+        {
+            lineBuffer.flip();
+            final byte tmp = lineBuffer.get();
+            lineBuffer.rewind();
+            stringBuffer.put(tmp);
+            count++;
+            if (tmp == '\n' || count == 1024)
+            {
+                break;
+            }
+        }
+        return count > 0 ? count : -1;
+    }
+
+    static String readLine(final ReadableByteChannel channel)
+            throws IOException
+    {
+        // System.out.println("ReadLine()");
+        int charsRead = read(channel);
+        if (charsRead == -1)
+        {
+            return "";
+        }
+        if (stringBuffer.get(charsRead - 1) == '\n')
+        {
+            charsRead -= 1;
+        }
+        if (stringBuffer.get(charsRead - 1) == '\r')
+        {
+            charsRead -= 1;
+        }
+        final String result = new String(stringBuffer.array(), 0, charsRead);
+        stringBuffer.rewind();
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> attributes()
+    {
+        return attributes;
+    }
+
+    @Override
+    public Content content()
+    {
+        return reqContent;
+    }
+
+    @Override
+    public Cookie[] cookie()
+    {
+        return requestCookie;
+    }
+
+    @Override
+    public Map<String, String> header()
+    {
+        return requestHeader;
+    }
+
+    @Override
+    public Method method()
+    {
+        return method;
+    }
+
+    @Override
+    public Map<String, Object> parameter()
+    {
+        return parameter;
+    }
+
+    @Override
+    public String path()
+    {
+        return path;
+    }
+
+    @Override
+    public String query()
+    {
+        return query;
+    }
+
+    @Override
+    public InetAddress remoteAddress()
+    {
+        return remoteAddress;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ReflectionToString.toString(this);
+    }
+
+    @Override
+    public String version()
+    {
+        return version;
+    }
+
+    /**
+     * @param remoteAddress
+     * @param channel
+     * @throws IOException
+     */
+    public WsgiRequest(final InetAddress remoteAddress,
+            final ReadableByteChannel channel) throws IOException
+    {
+        /*
+         * remoteAddress
+         */
+        this.remoteAddress = remoteAddress;
+
+        /*
+         * header
+         */
+        requestHeader = new HashMap<String, String>();
+        final String requestLine = readLine(channel);
+        for (String line; (line = readLine(channel)).isEmpty() == false;)
+        {
+            final int idx = line.indexOf(':');
+            requestHeader.put(line.substring(0, idx), line.substring(idx + 2));
+        }
+
+        /*
+         * content
+         */
+        reqContent = new Request.Content()
+        {
+            @Override
+            public ReadableByteChannel channel()
+            {
+                return channel;
+            }
+
+            @Override
+            public int length()
+            {
+                return length;
+            }
+
+            @Override
+            public String type()
+            {
+                return type;
+            }
+
+            final int length;
+            final String type;
+
+            {
+                final String strType = requestHeader.remove("Content-Type");
+                type = strType == null ? "" : strType;
+                final String strLength = requestHeader.remove("Content-Length");
+                length = strLength == null ? 0 : Integer.parseInt(strLength);
+            }
+        };
+
+        /*
+         * parameter
+         */
+        {
+            final int endMethod = requestLine.indexOf(' ');
+            final int endUrl = requestLine.indexOf(' ', endMethod + 1);
+            final String url = requestLine.substring(endMethod + 1, endUrl);
+            final int qidx = url.indexOf('?');
+            final String rpath = qidx == -1 ? url : url.substring(qidx);
+            method = Method.valueOf(requestLine.substring(0, endMethod));
+            path = Server.URL.decode(rpath);
+            query = qidx == -1 ? "" : url.substring(qidx);
+            version = requestLine.substring(endUrl + 1);
+        }
+        parameter = Parameter.post(query, reqContent);
+
+        /*
+         * cookies
+         */
+        final String cookieHeader = requestHeader.get("Cookie");
+        final String[] cookieTokens = cookieHeader == null ? new String[] {}
+                : cookieHeader.split("; ");
+        requestCookie = new Cookie[cookieTokens.length];
+        for (int i = 0, length = requestCookie.length; i < length; i++)
+        {
+            final String token = cookieTokens[i];
+            final int idx = token.indexOf('=');
+            final String name = token.substring(0, idx);
+            final String value = token.substring(idx + 1);
+            final Cookie cookie = new Cookie(name, value);
+            requestCookie[i] = cookie;
+        }
+    }
+
+    final HashMap<String, Object> attributes = new HashMap<String, Object>();
+    final Method method;
+    final Map<String, Object> parameter;
+    final String path;
+    final String query;
+    final InetAddress remoteAddress;
+    final Content reqContent;
+    final Cookie[] requestCookie;
+    final HashMap<String, String> requestHeader;
+    final String version;
+
+}

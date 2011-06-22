@@ -1,0 +1,15 @@
+package cc.aileron.peg;
+
+import java.util.List;
+
+/**
+ * @author aileron
+ */
+public interface PegParser
+{
+    /**
+     * @param context
+     * @return {@link PegValue}
+     */
+    List<StringBuilder> parse(PegContext context);
+}
