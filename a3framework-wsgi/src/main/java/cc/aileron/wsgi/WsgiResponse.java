@@ -20,7 +20,7 @@ import cc.aileron.wsgi.Wsgi.Response;
 /**
  * @author aileron
  */
-public class WsgiResponse extends Wsgi.Response
+public class WsgiResponse implements Wsgi.Response
 {
     /**
      * HeaderItem
@@ -76,7 +76,7 @@ public class WsgiResponse extends Wsgi.Response
          * http status code
          */
         final String reason = Server.MESSAGE[status / 100][status % 100];
-        builder.append(version)
+        builder.append("HTTP/1.1")
                 .append(' ')
                 .append(status)
                 .append(' ')
@@ -157,15 +157,12 @@ public class WsgiResponse extends Wsgi.Response
 
     /**
      * @param output
-     * @param version
      */
-    public WsgiResponse(final OutputStream output, final String version)
+    public WsgiResponse(final OutputStream output)
     {
         this.output = output;
-        this.version = version;
         header = new Response.Header()
         {
-
             @Override
             public Header add(final Cookie cookie)
             {
@@ -220,5 +217,4 @@ public class WsgiResponse extends Wsgi.Response
     final ArrayList<Cookie> responseCookies = new ArrayList<Cookie>();
     int status = 200;
     StreamWriteProcesser streamProcesser;
-    final String version;
 }

@@ -200,12 +200,6 @@ public class WsgiRequest implements Wsgi.Request
         return ReflectionToString.toString(this);
     }
 
-    @Override
-    public String version()
-    {
-        return version;
-    }
-
     /**
      * @param remoteAddress
      * @param stream
@@ -272,7 +266,6 @@ public class WsgiRequest implements Wsgi.Request
          */
         final String[] reqToken = requestLine.split(" ");
         method = Method.valueOf(reqToken[0]);
-        version = reqToken[2];
         final int qidx = reqToken[1].indexOf('?');
         final String rpath = qidx == -1 ? reqToken[1]
                 : reqToken[1].substring(qidx);
@@ -307,6 +300,5 @@ public class WsgiRequest implements Wsgi.Request
     final Content reqContent;
     final Cookie[] requestCookie;
     final HashMap<String, String> requestHeader;
-    final String version;
 
 }

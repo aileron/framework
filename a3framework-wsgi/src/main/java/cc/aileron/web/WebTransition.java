@@ -141,12 +141,6 @@ public class WebTransition
                         return old.remoteAddress();
                     }
 
-                    @Override
-                    public String version()
-                    {
-                        return old.version();
-                    }
-
                     final Request old = context.request();
 
                 };

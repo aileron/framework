@@ -155,8 +155,7 @@ public class Server
             final InetAddress address = client.getInetAddress();
             final WsgiRequest req = new WsgiRequest(address,
                     client.getInputStream());
-            final WsgiResponse res = new WsgiResponse(client.getOutputStream(),
-                    req.version);
+            final WsgiResponse res = new WsgiResponse(client.getOutputStream());
 
             try
             {

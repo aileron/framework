@@ -21,6 +21,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
+import cc.aileron.generic.util.WorkQueue;
+
 /**
  * @requiresDependencyResolution test
  * @goal wsgi
@@ -91,6 +93,8 @@ public class WsgiMojo extends AbstractMojo
         final Properties config = new Properties();
         config.load(new URLClassLoader(classpath).getResourceAsStream("wsgi.properties"));
 
+        final WorkQueue worker = new WorkQueue(10);
+
         /*
          * listen
          */
@@ -100,7 +104,7 @@ public class WsgiMojo extends AbstractMojo
         {
             final Socket client = server.accept();
             final URLClassLoader loader = new URLClassLoader(classpath);
-            final Thread thread = new Thread(new Runnable()
+            worker.execute(new Runnable()
             {
                 @Override
                 public void run()
@@ -121,7 +125,6 @@ public class WsgiMojo extends AbstractMojo
                     }
                 }
             });
-            thread.run();
         }
     }
 

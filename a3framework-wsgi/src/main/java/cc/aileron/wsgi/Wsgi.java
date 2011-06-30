@@ -134,17 +134,12 @@ public abstract class Wsgi
          * @return {@link InetAddress}
          */
         InetAddress remoteAddress();
-
-        /**
-         * @return リクエストバージョン文字列
-         */
-        String version();
     }
 
     /**
      * レスポンス
      */
-    public static abstract class Response
+    public static interface Response
     {
         /**
          * Response-Header
@@ -213,23 +208,23 @@ public abstract class Wsgi
         /**
          * @return {@link Header}
          */
-        public abstract Header header();
+        Header header();
+
+        /**
+         * @param processer
+         */
+        void out(PrintWriterProcesser processer);
+
+        /**
+         * @param processer
+         */
+        void out(StreamWriteProcesser processer);
 
         /**
          * @param location
          * @throws IOException
          */
-        public abstract void redirect(String location) throws IOException;
-
-        /**
-         * @param processer
-         */
-        abstract void out(PrintWriterProcesser processer);
-
-        /**
-         * @param processer
-         */
-        abstract void out(StreamWriteProcesser processer);
+        void redirect(String location) throws IOException;
     }
 
     /**

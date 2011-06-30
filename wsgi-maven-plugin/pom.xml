@@ -31,5 +31,10 @@
             <version>2.0</version>
         </dependency>
 
+        <dependency>
+        	<groupId>cc.aileron</groupId>
+        	<artifactId>a3framework-generic</artifactId>
+        	<version>0.1</version>
+        </dependency>
     </dependencies>
 </project>
