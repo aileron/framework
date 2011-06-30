@@ -49,10 +49,9 @@ public class Router extends Wsgi
             /*
              * hier 取得
              */
-            final WebBinder.Setting<Object> set = hier.get()
-                    .get(context.request().method(),
-                            context.request().path().substring(1),
-                            context.request().parameter());
+            final WebBinder.Setting<Object> set = hier.get(context.request()
+                    .method(), context.request().path(), context.request()
+                    .parameter());
 
             /*
              * ディスパッチされていない場合は、ファイル出力
@@ -114,10 +113,10 @@ public class Router extends Wsgi
     public Router(final ObjectReference<WebBinder.Container> hier)
             throws Exception
     {
-        this.hier = hier;
+        this.hier = hier.get();
     }
 
-    final ObjectReference<WebBinder.Container> hier;
+    final WebBinder.Container hier;
 
     final Wsgi localFile = new Wsgi()
     {

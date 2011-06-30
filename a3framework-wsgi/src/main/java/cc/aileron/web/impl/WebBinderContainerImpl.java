@@ -6,6 +6,7 @@ package cc.aileron.web.impl;
 import gnu.trove.TIntObjectHashMap;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,6 +38,16 @@ public class WebBinderContainerImpl implements WebBinder.Container
     }
 
     @Override
+    public void printDebugTree()
+    {
+        for (final Entry<String, Integer> e : container.all().entrySet())
+        {
+            System.err.println(e.getKey() + " "
+                    + objects.get(e.getValue()).type());
+        }
+    }
+
+    @Override
     public void set(final Method method, final String uri,
             final Setting<?> setting)
     {
@@ -62,6 +73,6 @@ public class WebBinderContainerImpl implements WebBinder.Container
     }
 
     private final UrlTreeContainer container;
-    private int id = 0;
+    private int id = 1;
     private final TIntObjectHashMap<Setting<?>> objects = new TIntObjectHashMap<Setting<?>>();
 }

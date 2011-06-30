@@ -8,12 +8,9 @@ import java.util.Set;
 
 import cc.aileron.wsgi.Wsgi.Method;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * @author aileron
  */
-@ImplementedBy(UrlTreeContainerImpl.class)
 public interface UrlTreeContainer
 {
     /**

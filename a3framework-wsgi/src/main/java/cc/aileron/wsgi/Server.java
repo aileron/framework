@@ -7,13 +7,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
 import cc.aileron.generic.ObjectReference;
-import cc.aileron.generic.Resource;
 import cc.aileron.generic.util.ReflectionToString;
 import cc.aileron.generic.util.URLTranslator;
 import cc.aileron.generic.util.WorkQueue;
@@ -30,59 +27,6 @@ import cc.aileron.wsgi.Wsgi.Session;
 public class Server
 {
     /**
-     * 開発用
-     */
-    public static class Dev
-    {
-        /**
-         * @param classpath
-         * @throws IOException
-         */
-        public static void main(final URL... classpath) throws IOException
-        {
-            /*
-             * config
-             */
-            final Properties p = new Properties();
-            p.load(new URLClassLoader(classpath).getResourceAsStream("wsgi.properties"));
-
-            /*
-             * listen
-             */
-            final ServerSocket server;
-            try
-            {
-                server = new ServerSocket(PORT);
-            }
-            catch (final java.net.BindException e)
-            {
-                throw new Error(e);
-            }
-            for (;;)
-            {
-                final Socket client = server.accept();
-                final Thread thread = new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            exec(client, new Router(new WebModel(p)));
-                        }
-                        catch (final Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                thread.setContextClassLoader(new URLClassLoader(classpath));
-                thread.start();
-            }
-        }
-    }
-
-    /**
      * サーバーの文字コード
      */
     static final Charset ENCODING = Charset.forName("UTF-8");
@@ -90,8 +34,28 @@ public class Server
     /**
      * メッセージリソース
      */
-    static final Properties MESSAGE = Resource.Loader.get("cc/aileron/wsgi/Reason.properties")
-            .toProperties();
+    static final String[][] MESSAGE = {
+            { "Continue", "Switching Protocols", "Processing", },
+            { "OK", "Created", "Accepted", "Non-Authoritative Information",
+                    "No Content", "Reset Content", "Partial Content",
+                    "Multi-Status", },
+            { "Multiple Choices", "Moved Permanently", "Found", "See Other",
+                    "Not Modified", "Use Proxy", "unused",
+                    "Temporary Redirect", },
+            { "Bad Request", "Authorization Required", "Payment Required",
+                    "Forbidden", "Not Found", "Method Not Allowed",
+                    "Not Acceptable", "Proxy Authentication Required",
+                    "Request Time-out", "Conflict", "Gone", "Length Required",
+                    "Precondition Failed", "Request Entity Too Large",
+                    "Request-URI Too Large", "Unsupported Media Type",
+                    "Requested Range Not Satisfiable", "Expectation Failed",
+                    "unused", "unused", "unused", "unused",
+                    "Unprocessable Entity", "Locked", "Failed Dependency",
+                    "No code", "Upgrade Required", },
+            { "Internal Server Error", "Method Not Implemented", "Bad Gateway",
+                    "Service Temporarily Unavailable", "Gateway Time-out",
+                    "HTTP Version Not Supported", "Variant Also Negotiates",
+                    "Insufficient Storage", "unused", "unused", "Not Extended", }, };
 
     /**
      * ポート
@@ -102,6 +66,24 @@ public class Server
      * URLデコード/エンコード
      */
     static final URLTranslator URL = URLTranslator.factory.get(ENCODING);
+
+    /**
+     * 
+     * 
+     * @param client
+     * @param p
+     * @param loader
+     * @throws Exception
+     */
+    public static void exec(final Socket client, final Properties p,
+            final ClassLoader loader) throws Exception
+    {
+        final long time = System.currentTimeMillis();
+        final Router router = new Router(new WebModel(p, loader));
+        final long moduleInitTime = System.currentTimeMillis() - time;
+        System.err.println("module initialized " + moduleInitTime + "ms.");
+        exec(client, router);
+    }
 
     /**
      * @throws Exception
@@ -164,11 +146,6 @@ public class Server
         {
             e.printStackTrace();
         }
-    }
-
-    static void exec(final Socket client, final Properties p) throws Exception
-    {
-        exec(client, new Router(new WebModel(p)));
     }
 
     static void exec(final Socket client, final Router router)

@@ -136,6 +136,21 @@ public class UrlTreeContainerTest
         as(3, "/test_edit", GET, "");
 
         as(0, "/style.css", GET, "");
+
+    }
+
+    /**
+     * test
+     */
+    @Test
+    public void test4()
+    {
+        t.put("/", GET, 1);
+        t.put("/${name}", GET, 2);
+
+        as(1, "/", GET, "");
+        as(2, "/aaaaaa", GET, "");
+
     }
 
     private void as(final int id, final String url, final Method method,

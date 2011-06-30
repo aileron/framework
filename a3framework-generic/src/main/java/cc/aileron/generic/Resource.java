@@ -51,7 +51,8 @@ public interface Resource extends Option
 
         private void addLoader(final URL url)
         {
-            if (!url.toString().endsWith(".jar"))
+            final String protocol = url.getProtocol();
+            if (protocol.equals("file"))
             {
                 final File base;
                 try
@@ -60,6 +61,7 @@ public interface Resource extends Option
                 }
                 catch (final URISyntaxException e)
                 {
+                    e.printStackTrace();
                     return;
                 }
                 list.add(new StreamLoader()
@@ -73,6 +75,7 @@ public interface Resource extends Option
                         }
                         catch (final FileNotFoundException e)
                         {
+                            e.printStackTrace();
                             return null;
                         }
                     }

@@ -5,7 +5,10 @@ package cc.aileron.web;
 
 import java.util.Properties;
 
+import cc.aileron.commons.di.InstanceRepository;
 import cc.aileron.generic.ObjectReference;
+import cc.aileron.hier.UrlTreeContainerDelimiter;
+import cc.aileron.hier.UrlTreeContainerImpl;
 import cc.aileron.pojo.PojoAccessor;
 import cc.aileron.pojo.PojoAccessorRepository;
 import cc.aileron.web.WebBinder.Container;
@@ -42,11 +45,20 @@ public class WebModel implements ObjectReference<WebBinder.Container>
     }
 
     /**
+     * @param p
+     * @throws Exception
+     */
+    public WebModel(final Properties p) throws Exception
+    {
+        this(p, Thread.currentThread().getContextClassLoader());
+    }
+
+    /**
      * @param loader
      * @param p
      * @throws Exception
      */
-    public WebModel(final ClassLoader loader, final Properties p)
+    public WebModel(final Properties p, final ClassLoader loader)
             throws Exception
     {
 
@@ -78,12 +90,7 @@ public class WebModel implements ObjectReference<WebBinder.Container>
             public void configure(final Binder binder)
             {
                 binder.install(applicationModule);
-                binder.bind(WebBinder.Container.class)
-                        .to(WebBinderContainerImpl.class)
-                        .asEagerSingleton();
-                binder.bind(WebBinder.class)
-                        .to(WebBinderImpl.class)
-                        .asEagerSingleton();
+
                 /*
                  * binder.bindScope(WebScope.Session.class, new Scope() {
                  * 
@@ -102,24 +109,18 @@ public class WebModel implements ObjectReference<WebBinder.Container>
         });
 
         /*
-         * web app configuration
+         * コンテナインスタンス取得
          */
-        final WebBinder binder = injector.getInstance(WebBinder.class);
-        injector.getInstance(configureClass).configure(binder);
+        final UrlTreeContainerDelimiter delimiter = injector.getInstance(UrlTreeContainerDelimiter.class);
+        container = new WebBinderContainerImpl(new UrlTreeContainerImpl(delimiter));
+        final WebBinder binder = new WebBinderImpl(container,
+                injector.getInstance(InstanceRepository.class));
 
         /*
-         * container
+         * web app configuration
          */
-        container = injector.getInstance(WebBinder.Container.class);
-    }
-
-    /**
-     * @param properties
-     * @throws Exception
-     */
-    public WebModel(final Properties properties) throws Exception
-    {
-        this(Thread.currentThread().getContextClassLoader(), properties);
+        injector.getInstance(configureClass).configure(binder);
+        container.printDebugTree();
     }
 
     private final PojoAccessorRepository accessorRepository = PojoAccessor.Repository;

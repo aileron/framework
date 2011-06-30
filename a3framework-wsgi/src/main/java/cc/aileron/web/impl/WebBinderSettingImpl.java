@@ -53,6 +53,12 @@ public class WebBinderSettingImpl<T> implements WebBinder.Setting<T>
         return instance.get(resource);
     }
 
+    @Override
+    public Class<T> type()
+    {
+        return resource;
+    }
+
     /**
      * @param resource
      * @param instance

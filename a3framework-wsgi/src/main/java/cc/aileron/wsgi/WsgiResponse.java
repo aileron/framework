@@ -75,12 +75,12 @@ public class WsgiResponse extends Wsgi.Response
         /*
          * http status code
          */
+        final String reason = Server.MESSAGE[status / 100][status % 100];
         builder.append(version)
                 .append(' ')
                 .append(status)
                 .append(' ')
-                .append(Server.MESSAGE.getProperty("Wsgi.Response.reasonPhrase."
-                        + status))
+                .append(reason)
                 .append("\n");
 
         /*

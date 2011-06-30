@@ -61,7 +61,7 @@
         <module>a3framework-template</module>
         <module>a3framework-dao</module>
         <module>a3framework-wsgi</module>
-        <module>a3framework-wsgi-maven-plugin</module>
+        <module>maven-wsgi-plugin</module>
         <module>a3framework-wsgi-template</module>
         <module>a3framework-wsgi-mobile</module>
         <module>a3framework-webclient</module>

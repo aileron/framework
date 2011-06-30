@@ -57,6 +57,11 @@ public interface WebBinder
                 Map<String, Object> parameter);
 
         /**
+         * デバッグ用プリント
+         */
+        void printDebugTree();
+
+        /**
          * @param method
          * @param uri
          * @param setting
@@ -122,6 +127,11 @@ public interface WebBinder
          */
         T resource();
 
+        /**
+         * @return type
+         */
+        Class<T> type();
+
     }
 
     /**
@@ -130,4 +140,10 @@ public interface WebBinder
      * @return {@link Bind}
      */
     <T> Bind<T> bind(Class<T> type);
+
+    /**
+     * @param configure
+     * @throws Exception
+     */
+    void install(WebConfigure configure) throws Exception;
 }

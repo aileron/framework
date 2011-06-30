@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import cc.aileron.generic.util.SkipList;
@@ -292,9 +291,15 @@ public class UrlTreeContainerImpl implements UrlTreeContainer
     }
 
     /**
+     */
+    public UrlTreeContainerImpl()
+    {
+        this.delimiter = new UrlTreeContainerDelimiterDefault().value();
+    }
+
+    /**
      * @param delimiter
      */
-    @Inject
     public UrlTreeContainerImpl(final UrlTreeContainerDelimiter delimiter)
     {
         this.delimiter = delimiter.value();

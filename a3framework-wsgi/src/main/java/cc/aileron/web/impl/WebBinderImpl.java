@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import cc.aileron.commons.di.InstanceRepository;
 import cc.aileron.web.WebBinder;
+import cc.aileron.web.WebConfigure;
 import cc.aileron.wsgi.Wsgi.Method;
 
 /**
@@ -42,6 +43,12 @@ public class WebBinderImpl implements WebBinder
         };
     }
 
+    @Override
+    public void install(final WebConfigure configure) throws Exception
+    {
+        configure.configure(this);
+    }
+
     /**
      * @param container
      * @param instance
@@ -55,6 +62,7 @@ public class WebBinderImpl implements WebBinder
     }
 
     final Container container;
+
     final InstanceRepository instance;
 
 }
