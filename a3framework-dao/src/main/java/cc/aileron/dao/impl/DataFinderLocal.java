@@ -116,6 +116,12 @@ public class DataFinderLocal<T> implements DataFinder<T>
     }
 
     @Override
+    public boolean exist()
+    {
+        return count() > 0;
+    }
+
+    @Override
     public List<T> list()
     {
         final SkipList<T> result = new SkipList<T>();

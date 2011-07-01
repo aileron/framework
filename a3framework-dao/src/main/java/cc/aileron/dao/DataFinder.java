@@ -29,6 +29,11 @@ public interface DataFinder<T>
     void each(Procedure<T> t);
 
     /**
+     * @return exist
+     */
+    boolean exist();
+
+    /**
      * @return list
      */
     List<T> list();
