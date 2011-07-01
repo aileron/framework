@@ -79,6 +79,7 @@ public class DataTransactionImpl implements DataTransaction
         try
         {
             local().connection.close();
+            local.remove();
         }
         catch (final SQLException e)
         {

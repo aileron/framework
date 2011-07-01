@@ -278,7 +278,7 @@ public abstract class Wsgi
     /**
      * thread-local-context
      */
-    static final ThreadLocal<Context> Context = new ThreadLocal<Context>();
+    public static final ThreadLocal<Context> Context = new ThreadLocal<Context>();
 
     /**
      * @return {@link Context}

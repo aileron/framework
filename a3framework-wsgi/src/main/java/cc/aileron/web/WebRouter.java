@@ -7,9 +7,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,17 +28,22 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cc.aileron.generic.$;
+import cc.aileron.generic.ConsCell;
 import cc.aileron.generic.Resource;
 import cc.aileron.generic.Resource.Loader;
 import cc.aileron.web.WebProcess.Case;
 import cc.aileron.wsgi.Wsgi;
 import cc.aileron.wsgi.Wsgi.Method;
 import cc.aileron.wsgi.Wsgi.Request;
+import cc.aileron.wsgi.Wsgi.Response;
+import cc.aileron.wsgi.Wsgi.Response.Header;
+import cc.aileron.wsgi.Wsgi.Session;
 
 /**
  * @author aileron
@@ -43,6 +53,7 @@ public class WebRouter implements Filter
     @Override
     public void destroy()
     {
+        Wsgi.Context.remove();
     }
 
     @Override
@@ -103,7 +114,7 @@ public class WebRouter implements Filter
             @Override
             public Map<String, Object> parameter()
             {
-                return p;
+                return parameter;
             }
 
             @Override
@@ -128,8 +139,6 @@ public class WebRouter implements Filter
             final Cookie[] cookie;
 
             final HashMap<String, String> header = new HashMap<String, String>();
-
-            final HashMap<String, Object> p;
             final String query;
 
             {
@@ -140,7 +149,6 @@ public class WebRouter implements Filter
                 }
                 cookie = req.getCookies();
                 query = req.getQueryString();
-                p = $.cast(req.getParameterMap());
 
                 for (final Enumeration<String> e = $.cast(req.getHeaderNames()); e.hasMoreElements();)
                 {
@@ -151,36 +159,160 @@ public class WebRouter implements Filter
             }
         };
 
-        class WebResponse implements Wsgi.Response
+        final Header h = new Wsgi.Response.Header()
         {
+            @Override
+            public Header add(final Cookie cookie)
+            {
+                cookies.add(cookie);
+                return this;
+            }
 
+            @Override
+            public Header add(final String key, final String value)
+            {
+                headers.add(cell(key, value));
+                return this;
+            }
+
+            public ConsCell<String, String> cell(final String key,
+                    final String value)
+            {
+                return new ConsCell<String, String>()
+                {
+
+                    @Override
+                    public String car()
+                    {
+                        return key;
+                    }
+
+                    @Override
+                    public String cdr()
+                    {
+                        return value;
+                    }
+
+                    @Override
+                    public boolean equals(final Object obj)
+                    {
+                        return obj instanceof ConsCell
+                                && $.<ConsCell<String, String>> cast(obj).car() == car();
+                    }
+
+                    @Override
+                    public int hashCode()
+                    {
+                        return car().hashCode();
+                    }
+                };
+            }
+
+            @Override
+            public Iterator<ConsCell<String, String>> iterator()
+            {
+                return headers.iterator();
+            }
+
+            @Override
+            public Header set(final String key, final String value)
+            {
+                final ConsCell<String, String> cell = cell(key, value);
+                headers.remove(cell);
+                headers.add(cell);
+                return this;
+            }
+
+            @Override
+            public int status()
+            {
+                return status;
+            }
+
+            @Override
+            public Header status(final int status)
+            {
+                this.status = status;
+                return this;
+            }
+
+            final LinkedList<Cookie> cookies = new LinkedList<Cookie>();
+
+            final LinkedList<ConsCell<String, String>> headers = new LinkedList<ConsCell<String, String>>();
+
+            int status = 200;
+        };
+
+        class Res implements Wsgi.Response
+        {
             @Override
             public Header header()
             {
-                return null;
+                return h;
             }
 
             @Override
             public void out(final PrintWriterProcesser processer)
             {
-
+                this.print = processer;
             }
 
             @Override
             public void out(final StreamWriteProcesser processer)
             {
-
+                stream = processer;
             }
 
             @Override
             public void redirect(final String location) throws IOException
             {
-
+                this.location = location;
             }
-        }
-        ;
 
-        // WebContext.set(c, req, res, parameter);
+            public String location;
+
+            public PrintWriterProcesser print;
+
+            public StreamWriteProcesser stream;
+        }
+        final Res l = new Res();
+        final Wsgi.Session s = new Wsgi.Session()
+        {
+
+            @Override
+            public <T> T get(final String key)
+            {
+                return $.cast(session.getAttribute(key));
+            }
+
+            @Override
+            public void put(final String key, final Object value)
+            {
+                session.setAttribute(key, value);
+            }
+
+            HttpSession session = req.getSession(true);
+        };
+        Wsgi.Context(new Wsgi.Context()
+        {
+            @Override
+            public Request request()
+            {
+                return r;
+            }
+
+            @Override
+            public Response response()
+            {
+                return l;
+            }
+
+            @Override
+            public Session session()
+            {
+                return s;
+            }
+        });
         final Object resource = set.resource();
         if (logger.isTraceEnabled())
         {
@@ -220,6 +352,32 @@ public class WebRouter implements Filter
         finally
         {
             Wsgi.Context(null);
+            if (l.location != null)
+            {
+                Wsgi.Context(null);
+                res.sendRedirect(l.location);
+                return;
+            }
+            if (l.stream != null)
+            {
+                try
+                {
+                    l.stream.write(res.getOutputStream());
+                    Wsgi.Context(null);
+                }
+                catch (final Exception e)
+                {
+                    logger.error("write", e);
+                }
+                return;
+            }
+            if (l.print != null)
+            {
+                l.print.write(new PrintWriter(new OutputStreamWriter(response.getOutputStream(),
+                        Charset.forName("UTF-8"))));
+                Wsgi.Context(null);
+                return;
+            }
         }
     }
 
@@ -246,8 +404,9 @@ public class WebRouter implements Filter
                     }
                 }
             });
-            container = new WebModel(Resource.Loader.get("wsgi.properties")
-                    .toProperties()).get();
+            model = new WebModel(Resource.Loader.get("wsgi.properties")
+                    .toProperties());
+            container = model.get();
         }
         catch (final Exception e)
         {
@@ -257,6 +416,8 @@ public class WebRouter implements Filter
     }
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private ServletContext c;
     private WebBinder.Container container;
+    private WebModel model;
 }
