@@ -27,14 +27,14 @@ public class DataAccessorModule implements Module
     public void configure(final Binder binder)
     {
         binder.requestInjection(i);
-        final LinkedBindingBuilder<DataAccessorRepository> b;
+        final LinkedBindingBuilder<DataAccessorObjects> b;
         if (an == null)
         {
-            b = binder.bind(DataAccessorRepository.class);
+            b = binder.bind(DataAccessorObjects.class);
         }
         else
         {
-            b = binder.bind(DataAccessorRepository.class).annotatedWith(an);
+            b = binder.bind(DataAccessorObjects.class).annotatedWith(an);
         }
         b.toInstance(entityAccessorRepository);
 
@@ -87,7 +87,7 @@ public class DataAccessorModule implements Module
     {
         this.transaction = transaction;
         this.an = an;
-        this.entityAccessorRepository = DataAccessorRepository.factory.get(isCache,
+        this.entityAccessorRepository = DataAccessorObjects.factory.get(isCache,
                 i,
                 transaction,
                 new StatmentLoggerImpl());
@@ -115,7 +115,7 @@ public class DataAccessorModule implements Module
 
     private final Class<? extends Annotation> an;
 
-    private final DataAccessorRepository entityAccessorRepository;
+    private final DataAccessorObjects entityAccessorRepository;
     private final ObjectProvider<Class<?>, Object> i = new ObjectProvider<Class<?>, Object>()
     {
         @Override

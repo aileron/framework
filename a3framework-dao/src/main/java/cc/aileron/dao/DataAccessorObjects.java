@@ -3,14 +3,14 @@
  */
 package cc.aileron.dao;
 
-import cc.aileron.dao.impl.DataAccessorRepositoryFactoryImpl;
+import cc.aileron.dao.impl.DataAccessorObjectsFactoryImpl;
 import cc.aileron.dao.jdbc.StatmentLogger;
 import cc.aileron.generic.ObjectProvider;
 
 /**
  * @author aileron
  */
-public interface DataAccessorRepository
+public interface DataAccessorObjects
 {
     /**
      * Factory
@@ -22,9 +22,9 @@ public interface DataAccessorRepository
          * @param instanceRepository
          * @param transaction
          * @param logger
-         * @return {@link DataAccessorRepository}
+         * @return {@link DataAccessorObjects}
          */
-        DataAccessorRepository get(boolean isCache,
+        DataAccessorObjects get(boolean isCache,
                 final ObjectProvider<Class<?>, Object> instanceRepository,
                 DataTransaction transaction, StatmentLogger logger);
 
@@ -34,9 +34,9 @@ public interface DataAccessorRepository
          * @param transaction
          * @param logger
          * @param delegateRepository 
-         * @return {@link DataAccessorRepository}
+         * @return {@link DataAccessorObjects}
          */
-        DataAccessorRepository get(boolean isCache,
+        DataAccessorObjects get(boolean isCache,
                 final ObjectProvider<Class<?>, Object> instanceRepository,
                 DataTransaction transaction, StatmentLogger logger,
                 DataAccessorDelegateRepository delegateRepository);
@@ -52,5 +52,5 @@ public interface DataAccessorRepository
     /**
      * factory
      */
-    Factory factory = new DataAccessorRepositoryFactoryImpl();
+    Factory factory = new DataAccessorObjectsFactoryImpl();
 }

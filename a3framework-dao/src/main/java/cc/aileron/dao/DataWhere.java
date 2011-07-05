@@ -12,6 +12,7 @@ import cc.aileron.generic.ObjectReference;
 public interface DataWhere<T>
 {
     /**
+     * delete
      */
     void delete();
 
@@ -26,6 +27,14 @@ public interface DataWhere<T>
      * @return {@link DataFinder}
      */
     <R> DataFinder<R> find(ObjectReference<R> factory);
+
+    /**
+     * insert
+     * 
+     * @param target
+     * @return serial number
+     */
+    int insert(T target);
 
     /**
      * @param target

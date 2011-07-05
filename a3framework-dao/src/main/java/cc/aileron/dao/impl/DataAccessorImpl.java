@@ -20,8 +20,8 @@ import cc.aileron.dao.jdbc.SqlTemplateFetcherImpl;
 import cc.aileron.dao.jdbc.StatmentExecutor;
 import cc.aileron.dao.jdbc.StatmentExecutorImpl;
 import cc.aileron.dao.jdbc.StatmentLogger;
-import cc.aileron.generic.ConsCell;
 import cc.aileron.generic.$.Flod;
+import cc.aileron.generic.ConsCell;
 import cc.aileron.generic.ObjectProvider;
 import cc.aileron.generic.ObjectReference;
 import cc.aileron.pojo.PojoAccessor;
@@ -32,16 +32,16 @@ import cc.aileron.template.Template;
  * @author aileron
  * @param <T>
  */
-class DataAccessorObjectImpl<T> implements DataAccessor<T>
+class DataAccessorImpl<T> implements DataAccessor<T>
 {
+
     @Override
-    public int insert(final T target)
+    public void execute()
     {
-        return statment.execute(new SqlTemplateFetcherImpl(accessorRepository,
+        statment.execute(new SqlTemplateFetcherImpl(accessorRepository,
                 templateRepository,
                 type,
-                "").fetch(SqlTemplateCategory.INSERT,
-                accessorRepository.from(target)));
+                "").fetch(SqlTemplateCategory.EXECUTE, null));
     }
 
     @Override
@@ -54,6 +54,7 @@ class DataAccessorObjectImpl<T> implements DataAccessor<T>
         }
         return new DataWhere<T>()
         {
+
             @Override
             public void delete()
             {
@@ -78,11 +79,19 @@ class DataAccessorObjectImpl<T> implements DataAccessor<T>
             }
 
             @Override
+            public int insert(final T target)
+            {
+                final DataFinderLocal<T> fetch = provider.get(Arrays.asList(conditions));
+                return statment.execute(fetch.fetcher.fetch(SqlTemplateCategory.INSERT,
+                        fetch.parameter.add(target)));
+            }
+
+            @Override
             public int update(final T target)
             {
                 final DataFinderLocal<T> fetch = provider.get(Arrays.asList(conditions));
                 return statment.execute(fetch.fetcher.fetch(SqlTemplateCategory.DELETE,
-                        fetch.parameter.add("target", target)));
+                        fetch.parameter.add(target)));
             }
         };
     }
@@ -121,7 +130,7 @@ class DataAccessorObjectImpl<T> implements DataAccessor<T>
      * @param instance
      * @param delegateRepository
      */
-    public DataAccessorObjectImpl(final Class<T> type,
+    public DataAccessorImpl(final Class<T> type,
             final DataTransaction transaction, final StatmentLogger logger,
             final boolean isCache,
             final PojoAccessorRepository accessorRepository,

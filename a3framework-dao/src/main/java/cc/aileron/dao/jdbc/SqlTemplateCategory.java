@@ -19,6 +19,11 @@ public enum SqlTemplateCategory
     DELETE("delete"),
 
     /**
+     * execute
+     */
+    EXECUTE("execute"),
+
+    /**
      * find
      */
     FIND("find"),

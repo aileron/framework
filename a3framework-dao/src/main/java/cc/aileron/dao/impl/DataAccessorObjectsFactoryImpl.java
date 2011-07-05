@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import cc.aileron.dao.DataAccessor;
 import cc.aileron.dao.DataAccessorDelegateRepository;
-import cc.aileron.dao.DataAccessorRepository;
+import cc.aileron.dao.DataAccessorObjects;
 import cc.aileron.dao.DataFinder;
 import cc.aileron.dao.DataTransaction;
 import cc.aileron.dao.DataWhere;
@@ -27,11 +27,11 @@ import cc.aileron.template.impl.TemplateRepositoryImpl;
 /**
  * @author aileron
  */
-public class DataAccessorRepositoryFactoryImpl implements
-        DataAccessorRepository.Factory
+public class DataAccessorObjectsFactoryImpl implements
+        DataAccessorObjects.Factory
 {
     @Override
-    public DataAccessorRepository get(final boolean isCache,
+    public DataAccessorObjects get(final boolean isCache,
             final ObjectProvider<Class<?>, Object> instanceRepository,
             final DataTransaction transaction, final StatmentLogger logger)
     {
@@ -51,17 +51,17 @@ public class DataAccessorRepositoryFactoryImpl implements
     }
 
     @Override
-    public DataAccessorRepository get(final boolean isCache,
+    public DataAccessorObjects get(final boolean isCache,
             final ObjectProvider<Class<?>, Object> instanceRepository,
             final DataTransaction transaction, final StatmentLogger logger,
             final DataAccessorDelegateRepository delegateRepository)
     {
-        return new DataAccessorRepository()
+        return new DataAccessorObjects()
         {
             @Override
             public <T> DataAccessor<T> from(final Class<T> target)
             {
-                return new DataAccessorObjectImpl<T>(target,
+                return new DataAccessorImpl<T>(target,
                         transaction,
                         logger,
                         isCache,

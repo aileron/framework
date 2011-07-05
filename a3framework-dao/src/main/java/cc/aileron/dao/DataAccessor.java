@@ -10,10 +10,9 @@ package cc.aileron.dao;
 public interface DataAccessor<T>
 {
     /**
-     * @param target
-     * @return int
+     * execute
      */
-    int insert(T target);
+    void execute();
 
     /**
      * @param conditions
