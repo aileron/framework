@@ -3,6 +3,7 @@
  */
 package cc.aileron.web.impl;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -27,176 +28,6 @@ public class WebParameterBinderImpl implements WebParameterBinder
 {
     static abstract class MethodInvoker<T>
     {
-        static final HashMap<Class<?>, ObjectTypeConvertor> map = new HashMap<Class<?>, ObjectTypeConvertor>();
-        static
-        {
-            map.put(new String[] {}.getClass(), new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] value)
-                {
-                    return value;
-                }
-            });
-            map.put(new int[] {}.getClass(), new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return null;
-                    }
-                    final int[] args = new int[k.length];
-                    for (int i = 0, size = k.length; i < size; i++)
-                    {
-                        args[i] = Integer.parseInt(k[i]);
-                    }
-                    return args;
-                }
-            });
-            map.put(new boolean[] {}.getClass(), new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return null;
-                    }
-                    final boolean[] args = new boolean[k.length];
-                    for (int i = 0, size = k.length; i < size; i++)
-                    {
-                        args[i] = Boolean.parseBoolean(k[i]);
-                    }
-                    return args;
-                }
-            });
-            map.put(new float[] {}.getClass(), new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return null;
-                    }
-                    final float[] args = new float[k.length];
-                    for (int i = 0, size = k.length; i < size; i++)
-                    {
-                        args[i] = Float.parseFloat(k[i]);
-                    }
-                    return args;
-                }
-            });
-            map.put(new double[] {}.getClass(), new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return null;
-                    }
-                    final double[] args = new double[k.length];
-                    for (int i = 0, size = k.length; i < size; i++)
-                    {
-                        args[i] = Double.parseDouble(k[i]);
-                    }
-                    return args;
-                }
-            });
-            map.put(new short[] {}.getClass(), new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return null;
-                    }
-                    final short[] args = new short[k.length];
-                    for (int i = 0, size = k.length; i < size; i++)
-                    {
-                        args[i] = Short.parseShort(k[i]);
-                    }
-                    return args;
-                }
-            });
-            map.put(Boolean.TYPE, new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return false;
-                    }
-                    return Boolean.parseBoolean(k[0]);
-                }
-            });
-            map.put(Float.TYPE, new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return 0;
-                    }
-                    return Float.parseFloat(k[0]);
-                }
-            });
-            map.put(Double.TYPE, new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return 0;
-                    }
-                    return Double.parseDouble(k[0]);
-                }
-            });
-            map.put(String.class, new ObjectTypeConvertor()
-            {
-
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return null;
-                    }
-                    return k[0];
-                }
-            });
-            map.put(Integer.TYPE, new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return 0;
-                    }
-                    return Integer.parseInt(k[0]);
-                }
-            });
-            map.put(Short.TYPE, new ObjectTypeConvertor()
-            {
-                @Override
-                public Object get(final String[] k)
-                {
-                    if (k == null)
-                    {
-                        return 0;
-                    }
-                    return Short.parseShort(k[0]);
-                }
-            });
-        }
 
         /**
          * @param self
@@ -289,11 +120,217 @@ public class WebParameterBinderImpl implements WebParameterBinder
                 InvocationTargetException;
     }
 
+    static final HashMap<Class<?>, ObjectTypeConvertor> map = new HashMap<Class<?>, ObjectTypeConvertor>();
+
+    static
+    {
+        map.put(new String[] {}.getClass(), new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] value)
+            {
+                return value;
+            }
+        });
+        map.put(new int[] {}.getClass(), new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return null;
+                }
+                final int[] args = new int[k.length];
+                for (int i = 0, size = k.length; i < size; i++)
+                {
+                    args[i] = Integer.parseInt(k[i]);
+                }
+                return args;
+            }
+        });
+        map.put(new boolean[] {}.getClass(), new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return null;
+                }
+                final boolean[] args = new boolean[k.length];
+                for (int i = 0, size = k.length; i < size; i++)
+                {
+                    args[i] = Boolean.parseBoolean(k[i]);
+                }
+                return args;
+            }
+        });
+        map.put(new float[] {}.getClass(), new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return null;
+                }
+                final float[] args = new float[k.length];
+                for (int i = 0, size = k.length; i < size; i++)
+                {
+                    args[i] = Float.parseFloat(k[i]);
+                }
+                return args;
+            }
+        });
+        map.put(new double[] {}.getClass(), new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return null;
+                }
+                final double[] args = new double[k.length];
+                for (int i = 0, size = k.length; i < size; i++)
+                {
+                    args[i] = Double.parseDouble(k[i]);
+                }
+                return args;
+            }
+        });
+        map.put(new short[] {}.getClass(), new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return null;
+                }
+                final short[] args = new short[k.length];
+                for (int i = 0, size = k.length; i < size; i++)
+                {
+                    args[i] = Short.parseShort(k[i]);
+                }
+                return args;
+            }
+        });
+        map.put(Boolean.TYPE, new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return false;
+                }
+                return Boolean.parseBoolean(k[0]);
+            }
+        });
+        map.put(Float.TYPE, new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return 0;
+                }
+                return Float.parseFloat(k[0]);
+            }
+        });
+        map.put(Double.TYPE, new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return 0;
+                }
+                return Double.parseDouble(k[0]);
+            }
+        });
+        map.put(String.class, new ObjectTypeConvertor()
+        {
+
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return null;
+                }
+                return k[0];
+            }
+        });
+        map.put(Integer.TYPE, new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return 0;
+                }
+                return Integer.parseInt(k[0]);
+            }
+        });
+        map.put(Short.TYPE, new ObjectTypeConvertor()
+        {
+            @Override
+            public Object get(final String[] k)
+            {
+                if (k == null)
+                {
+                    return 0;
+                }
+                return Short.parseShort(k[0]);
+            }
+        });
+    }
+
     @Override
     public <T> List<WebProcess<T>> bind(final Class<? super T> type)
             throws SecurityException, NoSuchMethodException
     {
         final SkipList<WebProcess<T>> results = new SkipList<WebProcess<T>>();
+        for (final Field field : type.getFields())
+        {
+            final WebParam param = field.getAnnotation(WebParam.class);
+            if (param == null)
+            {
+                continue;
+            }
+            final String[] keys;
+            if (param.value().length > 1)
+            {
+                throw new Error("WebParamアノテーションをフィールドに付与する際は、キーは一つしか使用出来ません");
+            }
+            if (param.value().length != 0)
+            {
+                keys = param.value();
+            }
+            else
+            {
+                keys = new String[] { field.getName() };
+            }
+            final ObjectTypeConvertor cnv = map.get(field.getType());
+            results.add(new WebProcess<T>()
+            {
+                @Override
+                public cc.aileron.web.WebProcess.Case process(final T resource)
+                        throws Exception
+                {
+                    final String[][] args = args(keys);
+                    field.set(resource, cnv.get(args[0]));
+                    return Case.CONTINUE;
+                }
+
+            });
+        }
         for (final Method method : type.getMethods())
         {
             final MethodInvoker<T> invoker = invoker(method);
@@ -308,24 +345,7 @@ public class WebParameterBinderImpl implements WebParameterBinder
                 public cc.aileron.web.WebProcess.Case process(final T resource)
                         throws Exception
                 {
-                    final Map<String, Object> parameter = Wsgi.Request()
-                            .parameter();
-                    final String[][] args = new String[keys.length][];
-                    for (int i = 0, size = args.length; i < size; i++)
-                    {
-                        final Object values = parameter.get(keys[i]);
-                        if (values == null)
-                        {
-                            args[i] = null;
-                            continue;
-                        }
-                        if (values.getClass().isArray())
-                        {
-                            args[i] = (String[]) values;
-                            continue;
-                        }
-                        args[i] = new String[] { (String) values };
-                    }
+                    final String[][] args = args(keys);
                     invoker.invoke(resource, args);
                     return Case.CONTINUE;
                 }
@@ -341,6 +361,28 @@ public class WebParameterBinderImpl implements WebParameterBinder
             results.add(p);
         }
         return results;
+    }
+
+    String[][] args(final String[] keys)
+    {
+        final Map<String, Object> parameter = Wsgi.Request().parameter();
+        final String[][] args = new String[keys.length][];
+        for (int i = 0, size = args.length; i < size; i++)
+        {
+            final Object values = parameter.get(keys[i]);
+            if (values == null)
+            {
+                args[i] = null;
+                continue;
+            }
+            if (values.getClass().isArray())
+            {
+                args[i] = (String[]) values;
+                continue;
+            }
+            args[i] = new String[] { (String) values };
+        }
+        return args;
     }
 
     private <T> MethodInvoker<T> invoker(final Method method)
