@@ -42,4 +42,30 @@ public class NoSuchPropertyError extends Error
             int len = target.length;
         }) + "]@" + name);
     }
+
+    /**
+     * @param e
+     * @param target
+     * @param name
+     */
+    public NoSuchPropertyError(final Throwable e, final String name,
+            final Object... target)
+    {
+        super("[" + $.join(",", new ObjectReference<String>()
+        {
+            @Override
+            public String get()
+            {
+                if (i < len)
+                {
+                    return target[i++].getClass().getName();
+                }
+                return null;
+            }
+
+            int i = 0;
+
+            int len = target.length;
+        }) + "]@" + name, e);
+    }
 }

@@ -20,7 +20,7 @@ public class NoSuchPropertyException extends Exception
      */
     public NoSuchPropertyError error()
     {
-        return new NoSuchPropertyError(name, target);
+        return new NoSuchPropertyError(this, name, target);
     }
 
     /**
