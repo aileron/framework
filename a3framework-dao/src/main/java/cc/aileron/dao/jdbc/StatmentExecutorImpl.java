@@ -115,7 +115,6 @@ public class StatmentExecutorImpl implements StatmentExecutor
         switch (transaction.db())
         {
         case MYSQL:
-            return serial;
         case H2:
             return serial;
         default:
