@@ -1,1 +1,6 @@
-*/target/*
+a3framework-commons/target
+a3framework-generic/target
+a3framework-template/target
+a3framework-webclient/target
+a3framework-webproxy/target
+a3framework-webspider/target

@@ -20,7 +20,7 @@ public class TokenizerImpl implements Tokenizer
     /**
      * @author aileron
      */
-    enum State
+    static enum State
     {
         OPEN_END
         {
